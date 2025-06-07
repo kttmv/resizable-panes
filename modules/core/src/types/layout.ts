@@ -8,6 +8,7 @@ export type LayoutOptions = {
   panes: PaneOptions[];
 
   dragInterval?: number;
+  dragAreaSize?: number;
   snapOffset?: number;
 };
 

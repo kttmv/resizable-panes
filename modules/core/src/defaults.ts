@@ -5,6 +5,7 @@ import { PaneOptions } from "./types/pane";
 export const defaultLayoutOptions: Required<GetOptional<LayoutOptions>> = {
   direction: "horizontal",
   dragInterval: 1,
+  dragAreaSize: 10,
   snapOffset: 30,
 };
 

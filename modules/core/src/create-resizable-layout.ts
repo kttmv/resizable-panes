@@ -2,6 +2,7 @@ import { createInitialState } from "./create-initial-state";
 import { updateLayout as renderLayout } from "./render-layout";
 import {
   attachResizerEventListeners,
+  detachResizerEventListeners,
   insertResizers,
   removeResizers,
 } from "./resizers";
@@ -31,6 +32,7 @@ export const createResizableLayout = (
     },
     deactivate: () => {
       removeResizers(state);
+      detachResizerEventListeners(state);
       updateState((state) => ({ ...state, active: false }));
     },
     // resize: (paneIndex: number, newSize: SizeDefinition) => {
