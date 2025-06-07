@@ -23,19 +23,24 @@ const horizontalLayout = createResizableLayout({
       element: document.getElementById("horizontal_1")!,
       size: "1fr",
       minSize: "100px",
+      maxSize: "300px",
     },
     {
       element: document.getElementById("horizontal_2")!,
       size: "2fr",
-      minSize: "2fr",
+      minSize: "150px",
+      maxSize: "400px",
     },
     {
       element: document.getElementById("horizontal_3")!,
       size: "3fr",
+      minSize: "200px",
+      maxSize: "400px",
     },
     {
       element: document.getElementById("horizontal_4")!,
       size: "4fr",
+      minSize: "100px",
     },
   ],
 });
@@ -43,22 +48,30 @@ const horizontalLayout = createResizableLayout({
 const verticalLayout = createResizableLayout({
   container: document.getElementById("test-container-vertical")!,
   direction: "vertical",
+  dragInterval: 5, // Moves in 5px increments
+  snapOffset: 15, // Snaps to min/max when within 15px
   panes: [
     {
       element: document.getElementById("vertical_1")!,
       size: "1fr",
+      minSize: "50px",
+      maxSize: "150px",
     },
     {
       element: document.getElementById("vertical_2")!,
       size: "2fr",
+      minSize: "80px",
+      maxSize: "200px",
     },
     {
       element: document.getElementById("vertical_3")!,
       size: "3fr",
+      minSize: "100px",
     },
     {
       element: document.getElementById("vertical_4")!,
       size: "4fr",
+      minSize: "60px",
     },
   ],
 });

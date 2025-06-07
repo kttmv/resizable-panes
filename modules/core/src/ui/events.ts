@@ -21,14 +21,12 @@ export function attachEventListeners(
 }
 
 export function detachEventListeners(state: LayoutState): void {
-  // Clean up resizer listeners
   for (const split of state.splits) {
     const element = split.resizerElement;
     element.removeEventListener("mousedown", () => {});
     element.style.cursor = "";
   }
 
-  // Clean up drag area listeners
   for (const pane of state.panes) {
     const element = pane.element;
     const listeners = eventListenerStore.get(element);
@@ -102,12 +100,19 @@ function createSplitDragHandler(
   const dragMove = (e: MouseEvent): void => {
     const mousePosition =
       state.configuration.direction === "horizontal" ? e.clientX : e.clientY;
-    const offset = mousePosition - dragStartPosition;
+    let offset = mousePosition - dragStartPosition;
 
-    updateState((currentState) =>
-      resizeSplit(currentState, splitIndex, offset),
-    );
-    dragStartPosition = mousePosition;
+    const dragInterval = state.configuration.dragInterval;
+    if (dragInterval > 1) {
+      offset = Math.round(offset / dragInterval) * dragInterval;
+    }
+
+    if (offset !== 0) {
+      updateState((currentState) =>
+        resizeSplit(currentState, splitIndex, offset),
+      );
+      dragStartPosition = mousePosition;
+    }
   };
 
   const dragEnd = (): void => {

@@ -1,4 +1,3 @@
-// CSS class names
 export const CSS_CLASSES = {
   RESIZER_HORIZONTAL: "resizable-panes-resizer-horizontal",
   RESIZER_VERTICAL: "resizable-panes-resizer-vertical",
@@ -6,7 +5,6 @@ export const CSS_CLASSES = {
   PANE: "resizable-panes-pane",
 } as const;
 
-// Default values
 export const DEFAULTS = {
   DIRECTION: "horizontal" as const,
   DRAG_INTERVAL: 1,
@@ -18,8 +16,6 @@ export const DEFAULTS = {
   COLLAPSED_SIZE: "0px" as const,
 } as const;
 
-// Thresholds and limits
 export const LIMITS = {
   MIN_PANES: 2,
-  DECIMAL_PRECISION: 1,
 } as const;

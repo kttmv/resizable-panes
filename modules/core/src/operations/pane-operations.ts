@@ -24,7 +24,7 @@ export function collapsePane(
   const pane = state.panes[paneIndex];
 
   if (!pane.collapsible) {
-    return state; // Cannot collapse non-collapsible pane
+    return state;
   }
 
   const updatedPanes = [...state.panes];

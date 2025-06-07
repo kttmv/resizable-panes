@@ -10,19 +10,41 @@ export function resizeSplit(
   const split = state.splits[splitIndex];
   const [paneA, paneB] = getSplitPanes(state, splitIndex);
 
-  // Calculate current sizes in pixels
   const currentSizeA = resolveSize(paneA.currentSize, state);
   const currentSizeB = resolveSize(paneB.currentSize, state);
 
-  // Calculate new sizes
-  const newSizeA = currentSizeA + offsetPx;
-  const newSizeB = currentSizeB - offsetPx;
-
-  // Check constraints
   const minSizeA = resolveSize(paneA.minSize, state);
   const minSizeB = resolveSize(paneB.minSize, state);
   const maxSizeA = resolveSize(paneA.maxSize, state);
   const maxSizeB = resolveSize(paneB.maxSize, state);
+
+  let newSizeA = currentSizeA + offsetPx;
+  let newSizeB = currentSizeB - offsetPx;
+
+  const snapOffset = state.configuration.snapOffset;
+  if (snapOffset > 0) {
+    // Check if pane A should snap to min/max
+    if (Math.abs(newSizeA - minSizeA) <= snapOffset) {
+      const snapOffsetA = newSizeA - minSizeA;
+      newSizeA = minSizeA;
+      newSizeB = newSizeB + snapOffsetA;
+    } else if (Math.abs(newSizeA - maxSizeA) <= snapOffset) {
+      const snapOffsetA = newSizeA - maxSizeA;
+      newSizeA = maxSizeA;
+      newSizeB = newSizeB + snapOffsetA;
+    }
+
+    // Check if pane B should snap to min/max
+    if (Math.abs(newSizeB - minSizeB) <= snapOffset) {
+      const snapOffsetB = newSizeB - minSizeB;
+      newSizeB = minSizeB;
+      newSizeA = newSizeA + snapOffsetB;
+    } else if (Math.abs(newSizeB - maxSizeB) <= snapOffset) {
+      const snapOffsetB = newSizeB - maxSizeB;
+      newSizeB = maxSizeB;
+      newSizeA = newSizeA + snapOffsetB;
+    }
+  }
 
   if (
     newSizeA < minSizeA ||
@@ -30,14 +52,12 @@ export function resizeSplit(
     newSizeA > maxSizeA ||
     newSizeB > maxSizeB
   ) {
-    return state; // Invalid resize, return unchanged state
+    return state;
   }
 
-  // Calculate scaling factors
   const factorA = newSizeA / currentSizeA;
   const factorB = newSizeB / currentSizeB;
 
-  // Apply scaling to preserve relative sizes
   const newPaneSizeA = mapSizeDefinition(
     paneA.currentSize,
     (value) => value * factorA,
@@ -47,7 +67,6 @@ export function resizeSplit(
     (value) => value * factorB,
   );
 
-  // Update pane sizes
   const updatedPanes = [...state.panes];
   updatedPanes[split.paneIndices[0]] = {
     ...paneA,
