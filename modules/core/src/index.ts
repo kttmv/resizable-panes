@@ -1,2 +1,1 @@
-export { ElasticPane } from "./ElasticPane";
-export { ElasticLayout } from "./ElasticLayout";
+export { createResizableLayout } from "./create-resizable-layout";

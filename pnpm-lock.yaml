@@ -44,7 +44,7 @@ importers:
 
   modules/playground:
     dependencies:
-      '@elastic-panes/core':
+      '@resizable-panes/core':
         specifier: workspace:*
         version: link:../core
 

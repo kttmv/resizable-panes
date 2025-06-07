@@ -1,12 +1,11 @@
-
-.elastic-resizer-horizontal {
+.resizer-horizontal {
   cursor: col-resize;
   background-color: blue;
   width: 4px;
   min-width: 4px;
 }
 
-.elastic-resizer-vertical {
+.resizer-vertical {
   cursor: row-resize;
   background-color: red;
   height: 4px;
@@ -27,8 +26,7 @@
 #test-container-horizontal {
   display: flex;
   height: 100%;
-  /* width: 100vw; */
-  width: 1012px;
+  width: 100vw;
 }
 
 #test-container-vertical {

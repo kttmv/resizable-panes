@@ -1,10 +1,11 @@
 {
-  "name": "elastic-panes-monorepo",
+  "name": "resizable-panes-monorepo",
   "private": true,
   "scripts": {
     "build": "npm run build:core",
     "build:core": "npm run build --prefix modules/core",
-    "format": "prettier . --write"
+    "format": "prettier . --write",
+    "dev": "npm run dev --prefix modules/playground"
   },
   "packageManager": "pnpm@9.12.0",
   "devDependencies": {

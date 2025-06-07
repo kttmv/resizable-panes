@@ -9,6 +9,6 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@elastic-panes/core": "workspace:*"
+    "@resizable-panes/core": "workspace:*"
   }
 }
