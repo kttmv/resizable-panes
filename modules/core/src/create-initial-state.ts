@@ -1,4 +1,4 @@
-import { createResizerElement } from "./create-resizer-element";
+import { createResizerElement } from "./resizers";
 import { LayoutOptions, LayoutState } from "./types/layout";
 import { PaneState } from "./types/pane";
 import { SplitState } from "./types/split";
@@ -22,6 +22,7 @@ export function createInitialState(layoutOptions: LayoutOptions): LayoutState {
 
   return {
     options: layoutOptions,
+    active: false,
     splits,
   };
 }

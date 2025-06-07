@@ -9,5 +9,6 @@ export type ResizableLayoutInstance = {
   // getState(): LayoutState;
   // // Lifecycle
   // refresh(): void; // recalculate after DOM changes
-  // destroy(): void;
+  activate: () => void;
+  deactivate: () => void;
 };

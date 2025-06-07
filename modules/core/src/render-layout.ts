@@ -1,14 +1,16 @@
 import { LayoutState } from "./types/layout";
 import { PaneState } from "./types/pane";
 
-export const insertResizers = (state: LayoutState): void => {
-  for (const split of state.splits) {
-    split.panes[0].options.element.after(split.resizerElement);
-  }
-};
-
 export const updateLayout = (state: LayoutState): void => {
   const containerStyle = state.options.container.style;
+
+  if (!state.active) {
+    containerStyle.display = "";
+    containerStyle.gridTemplateColumns = "";
+    containerStyle.gridTemplateRows = "";
+
+    return;
+  }
 
   containerStyle.display = "grid";
   containerStyle[

@@ -1,7 +1,7 @@
 import { createResizableLayout } from "@resizable-panes/core";
 import "./style.css";
 
-createResizableLayout({
+const mainLayout = createResizableLayout({
   container: document.getElementById("test-container")!,
   panes: [
     {
@@ -14,7 +14,7 @@ createResizableLayout({
   ],
 });
 
-createResizableLayout({
+const horizontalLayout = createResizableLayout({
   container: document.getElementById("test-container-horizontal")!,
   direction: "horizontal",
   panes: [
@@ -37,7 +37,7 @@ createResizableLayout({
   ],
 });
 
-createResizableLayout({
+const verticalLayout = createResizableLayout({
   container: document.getElementById("test-container-vertical")!,
   direction: "vertical",
   panes: [
@@ -58,4 +58,24 @@ createResizableLayout({
       size: "4fr",
     },
   ],
+});
+
+mainLayout.activate();
+horizontalLayout.activate();
+verticalLayout.activate();
+
+let active = true;
+
+document.getElementById("toggle-button")!.addEventListener("click", () => {
+  active = !active;
+
+  if (active) {
+    mainLayout.activate();
+    horizontalLayout.activate();
+    verticalLayout.activate();
+  } else {
+    mainLayout.deactivate();
+    horizontalLayout.deactivate();
+    verticalLayout.deactivate();
+  }
 });

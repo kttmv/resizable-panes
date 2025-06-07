@@ -1,5 +1,6 @@
 import { createInitialState } from "./create-initial-state";
-import { insertResizers, updateLayout } from "./render-layout";
+import { updateLayout as renderLayout } from "./render-layout";
+import { insertResizers, removeResizers } from "./resizers";
 import { ResizableLayoutInstance } from "./types/instance";
 import { LayoutOptions, LayoutState } from "./types/layout";
 
@@ -8,20 +9,25 @@ export const createResizableLayout = (
 ): ResizableLayoutInstance => {
   let state = createInitialState(options);
 
-  insertResizers(state);
-
   const updateState = (updater: (state: LayoutState) => LayoutState) => {
     const newState = updater(state);
     if (newState !== state) {
       state = newState;
-      updateLayout(state);
+      renderLayout(state);
     }
   };
 
-  updateLayout(state);
   //   attachEventListeners(state, updateState);
 
   return {
+    activate: () => {
+      insertResizers(state);
+      updateState((state) => ({ ...state, active: true }));
+    },
+    deactivate: () => {
+      removeResizers(state);
+      updateState((state) => ({ ...state, active: false }));
+    },
     // resize: (paneIndex: number, newSize: SizeDefinition) => {
     //     updateState((state) => resizePane(state, paneIndex, newSize));
     // },

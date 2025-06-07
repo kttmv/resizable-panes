@@ -13,5 +13,6 @@ export type LayoutOptions = {
 
 export type LayoutState = {
   options: LayoutOptions;
+  active: boolean;
   splits: SplitState[];
 };
