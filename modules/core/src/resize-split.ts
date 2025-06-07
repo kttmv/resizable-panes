@@ -19,16 +19,28 @@ export const resizeSplit = (
   const newSizeA_px = sizeA_px + offset_px;
   const newSizeB_px = sizeB_px - offset_px;
 
+  if (
+    newSizeA_px < resolveSize(paneA.options.minSize, state) ||
+    newSizeB_px < resolveSize(paneB.options.minSize, state) ||
+    newSizeA_px > resolveSize(paneA.options.maxSize, state) ||
+    newSizeB_px > resolveSize(paneB.options.maxSize, state)
+  ) {
+    return state;
+  }
+
   const factorA = newSizeA_px / sizeA_px;
   const factorB = newSizeB_px / sizeB_px;
 
+  const newSizeA = mapSizeDefinition(paneA.size, (value) => value * factorA);
+  const newSizeB = mapSizeDefinition(paneB.size, (value) => value * factorB);
+
   const newPaneA = {
     ...paneA,
-    size: mapSizeDefinition(paneA.size, (value) => value * factorA),
+    size: newSizeA,
   };
   const newPaneB = {
     ...paneB,
-    size: mapSizeDefinition(paneB.size, (value) => value * factorB),
+    size: newSizeB,
   };
 
   return {

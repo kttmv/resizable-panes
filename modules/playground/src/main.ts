@@ -3,6 +3,7 @@ import "./style.css";
 
 const mainLayout = createResizableLayout({
   container: document.getElementById("test-container")!,
+  direction: "vertical",
   panes: [
     {
       element: document.getElementById("test-container-horizontal")!,
@@ -21,10 +22,12 @@ const horizontalLayout = createResizableLayout({
     {
       element: document.getElementById("horizontal_1")!,
       size: "1fr",
+      minSize: "100px",
     },
     {
       element: document.getElementById("horizontal_2")!,
       size: "2fr",
+      minSize: "2fr",
     },
     {
       element: document.getElementById("horizontal_3")!,

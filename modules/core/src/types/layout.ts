@@ -11,8 +11,10 @@ export type LayoutOptions = {
   snapOffset?: number;
 };
 
+export type NormalizedLayoutOptions = Required<LayoutOptions>;
+
 export type LayoutState = {
-  options: LayoutOptions;
+  options: NormalizedLayoutOptions;
   active: boolean;
   panes: PaneState[];
   splits: SplitState[];

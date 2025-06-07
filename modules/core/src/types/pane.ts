@@ -13,8 +13,10 @@ export type PaneOptions = {
   collapsedSize?: SizeDefinition;
 };
 
+export type NormalizedPaneOptions = Required<PaneOptions>;
+
 export type PaneState = {
-  options: PaneOptions;
+  options: NormalizedPaneOptions;
   collapsed: boolean;
   size: SizeDefinition;
 };
