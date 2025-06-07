@@ -1,13 +1,13 @@
-.resizer-horizontal {
+.resizable-panes-resizer-horizontal {
   cursor: col-resize;
-  background-color: blue;
+  background-color: gray;
   width: 4px;
   min-width: 4px;
 }
 
-.resizer-vertical {
+.resizable-panes-resizer-vertical {
   cursor: row-resize;
-  background-color: red;
+  background-color: gray;
   height: 4px;
   min-height: 4px;
 }
