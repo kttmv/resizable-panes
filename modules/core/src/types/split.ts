@@ -1,6 +1,4 @@
-import { PaneState } from "./pane";
-
 export type SplitState = {
-  panes: [PaneState, PaneState];
+  paneIndices: [number, number];
   resizerElement: HTMLElement;
 };

@@ -1,4 +1,4 @@
-import { PaneOptions } from "./pane";
+import { PaneOptions, PaneState } from "./pane";
 import { SplitState } from "./split";
 
 export type LayoutOptions = {
@@ -14,5 +14,6 @@ export type LayoutOptions = {
 export type LayoutState = {
   options: LayoutOptions;
   active: boolean;
+  panes: PaneState[];
   splits: SplitState[];
 };

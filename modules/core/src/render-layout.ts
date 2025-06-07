@@ -1,3 +1,4 @@
+import { getSplitPanes } from "./resize-split";
 import { LayoutState } from "./types/layout";
 import { PaneState } from "./types/pane";
 
@@ -23,9 +24,11 @@ export const updateLayout = (state: LayoutState): void => {
       const getSize = (pane: PaneState) =>
         pane.collapsed ? pane.options.collapsedSize : pane.size;
 
-      const result = [getSize(split.panes[0]), "auto"];
+      const [paneA, paneB] = getSplitPanes(state, index);
+
+      const result = [getSize(paneA), "auto"];
       if (isLast) {
-        result.push(getSize(split.panes[1]));
+        result.push(getSize(paneB));
       }
 
       return result;

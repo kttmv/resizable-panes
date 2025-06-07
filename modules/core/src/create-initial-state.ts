@@ -15,7 +15,7 @@ export function createInitialState(layoutOptions: LayoutOptions): LayoutState {
   for (let i = 0; i < panes.length - 1; i++) {
     const resizerElement = createResizerElement(layoutOptions);
     splits.push({
-      panes: [panes[i], panes[i + 1]],
+      paneIndices: [i, i + 1],
       resizerElement,
     });
   }
@@ -23,6 +23,7 @@ export function createInitialState(layoutOptions: LayoutOptions): LayoutState {
   return {
     options: layoutOptions,
     active: false,
+    panes,
     splits,
   };
 }

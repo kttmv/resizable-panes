@@ -1,15 +1,20 @@
 import { createInitialState } from "./create-initial-state";
 import { updateLayout as renderLayout } from "./render-layout";
-import { insertResizers, removeResizers } from "./resizers";
+import {
+  attachResizerEventListeners,
+  insertResizers,
+  removeResizers,
+} from "./resizers";
 import { ResizableLayoutInstance } from "./types/instance";
-import { LayoutOptions, LayoutState } from "./types/layout";
+import { LayoutOptions } from "./types/layout";
+import { UpdateStateFunction } from "./types/state";
 
 export const createResizableLayout = (
   options: LayoutOptions,
 ): ResizableLayoutInstance => {
   let state = createInitialState(options);
 
-  const updateState = (updater: (state: LayoutState) => LayoutState) => {
+  const updateState: UpdateStateFunction = (updater) => {
     const newState = updater(state);
     if (newState !== state) {
       state = newState;
@@ -17,7 +22,7 @@ export const createResizableLayout = (
     }
   };
 
-  //   attachEventListeners(state, updateState);
+  attachResizerEventListeners(state, updateState);
 
   return {
     activate: () => {
