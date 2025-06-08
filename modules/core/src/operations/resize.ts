@@ -5,58 +5,97 @@ import type { LayoutState } from "../core/types";
 export function resizeSplit(
   state: LayoutState,
   splitIndex: number,
-  offsetPx: number,
+  newResizerPosition: number,
 ): LayoutState {
   const split = state.splits[splitIndex];
   const [paneA, paneB] = getSplitPanes(state, splitIndex);
 
+  const resizerSize =
+    state.configuration.direction === "horizontal"
+      ? split.resizerElement.offsetWidth
+      : split.resizerElement.offsetHeight;
+
   const currentSizeA = resolveSize(paneA.currentSize, state);
   const currentSizeB = resolveSize(paneB.currentSize, state);
+
+  console.log(
+    `Resizing split ${splitIndex}: newResizerPosition=${newResizerPosition}, resizerSize=${resizerSize}, currentSizeA=${currentSizeA}, currentSizeB=${currentSizeB}`,
+  );
+
+  const newSizeA = newResizerPosition - resizerSize / 2;
+  const newSizeB = currentSizeA + currentSizeB - newSizeA;
+
+  console.log(
+    `Calculated new sizes: newSizeA=${newSizeA}, newSizeB=${newSizeB}`,
+  );
 
   const minSizeA = resolveSize(paneA.minSize, state);
   const minSizeB = resolveSize(paneB.minSize, state);
   const maxSizeA = resolveSize(paneA.maxSize, state);
   const maxSizeB = resolveSize(paneB.maxSize, state);
 
-  let newSizeA = currentSizeA + offsetPx;
-  let newSizeB = currentSizeB - offsetPx;
+  let finalSizeA = newSizeA;
+  let finalSizeB = newSizeB;
 
   const snapOffset = state.configuration.snapOffset;
   if (snapOffset > 0) {
     // Check if pane A should snap to min/max
-    if (Math.abs(newSizeA - minSizeA) <= snapOffset) {
-      const snapOffsetA = newSizeA - minSizeA;
-      newSizeA = minSizeA;
-      newSizeB = newSizeB + snapOffsetA;
-    } else if (Math.abs(newSizeA - maxSizeA) <= snapOffset) {
-      const snapOffsetA = newSizeA - maxSizeA;
-      newSizeA = maxSizeA;
-      newSizeB = newSizeB + snapOffsetA;
+    if (Math.abs(finalSizeA - minSizeA) <= snapOffset) {
+      const snapOffsetA = finalSizeA - minSizeA;
+      finalSizeA = minSizeA;
+      finalSizeB = finalSizeB + snapOffsetA;
+
+      console.log(
+        `Pane A snapped to min size: finalSizeA=${finalSizeA}, finalSizeB=${finalSizeB}`,
+      );
+    } else if (Math.abs(finalSizeA - maxSizeA) <= snapOffset) {
+      const snapOffsetA = finalSizeA - maxSizeA;
+      finalSizeA = maxSizeA;
+      finalSizeB = finalSizeB + snapOffsetA;
+
+      console.log(
+        `Pane A snapped to max size: finalSizeA=${finalSizeA}, finalSizeB=${finalSizeB}`,
+      );
     }
 
     // Check if pane B should snap to min/max
-    if (Math.abs(newSizeB - minSizeB) <= snapOffset) {
-      const snapOffsetB = newSizeB - minSizeB;
-      newSizeB = minSizeB;
-      newSizeA = newSizeA + snapOffsetB;
-    } else if (Math.abs(newSizeB - maxSizeB) <= snapOffset) {
-      const snapOffsetB = newSizeB - maxSizeB;
-      newSizeB = maxSizeB;
-      newSizeA = newSizeA + snapOffsetB;
+    if (Math.abs(finalSizeB - minSizeB) <= snapOffset) {
+      const snapOffsetB = finalSizeB - minSizeB;
+      finalSizeB = minSizeB;
+      finalSizeA = finalSizeA + snapOffsetB;
+
+      console.log(
+        `Pane B snapped to min size: finalSizeA=${finalSizeA}, finalSizeB=${finalSizeB}`,
+      );
+    } else if (Math.abs(finalSizeB - maxSizeB) <= snapOffset) {
+      const snapOffsetB = finalSizeB - maxSizeB;
+      finalSizeB = maxSizeB;
+      finalSizeA = finalSizeA + snapOffsetB;
+
+      console.log(
+        `Pane B snapped to max size: finalSizeA=${finalSizeA}, finalSizeB=${finalSizeB}`,
+      );
     }
   }
 
   if (
-    newSizeA < minSizeA ||
-    newSizeB < minSizeB ||
-    newSizeA > maxSizeA ||
-    newSizeB > maxSizeB
+    finalSizeA < minSizeA ||
+    finalSizeB < minSizeB ||
+    finalSizeA > maxSizeA ||
+    finalSizeB > maxSizeB
   ) {
+    console.warn(
+      `Invalid sizes after resizing: finalSizeA=${finalSizeA}, finalSizeB=${finalSizeB}, minSizeA=${minSizeA}, minSizeB=${minSizeB}, maxSizeA=${maxSizeA}, maxSizeB=${maxSizeB}`,
+    );
     return state;
   }
 
-  const factorA = newSizeA / currentSizeA;
-  const factorB = newSizeB / currentSizeB;
+  const factorA = finalSizeA / currentSizeA;
+  const factorB = finalSizeB / currentSizeB;
+
+  console.log(
+    `Resize factors: factorA=${factorA}, factorB=${factorB}, currentSizeA=${currentSizeA}, currentSizeB=${currentSizeB}`,
+  );
 
   const newPaneSizeA = mapSizeDefinition(
     paneA.currentSize,
@@ -65,6 +104,10 @@ export function resizeSplit(
   const newPaneSizeB = mapSizeDefinition(
     paneB.currentSize,
     (value) => value * factorB,
+  );
+
+  console.log(
+    `Final sizes after mapping: newPaneSizeA=${newPaneSizeA}, newPaneSizeB=${newPaneSizeB}`,
   );
 
   const updatedPanes = [...state.panes];

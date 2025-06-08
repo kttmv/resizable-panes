@@ -88,15 +88,31 @@ function createSplitDragHandler(
   updateState: UpdateStateFunction,
 ) {
   let dragStartPosition: number;
+  let dragStartResizerPosition: number;
 
   const dragStart = (e: MouseEvent): void => {
     dragStartPosition =
       state.configuration.direction === "horizontal" ? e.clientX : e.clientY;
 
+    const split = state.splits[splitIndex];
+    const resizerRect = split.resizerElement.getBoundingClientRect();
+    const resizerCenter =
+      state.configuration.direction === "horizontal"
+        ? resizerRect.left + resizerRect.width / 2
+        : resizerRect.top + resizerRect.height / 2;
+
+    const firstPane = state.panes[split.paneIndices[0]];
+    const firstPaneRect = firstPane.element.getBoundingClientRect();
+    const firstPaneStart =
+      state.configuration.direction === "horizontal"
+        ? firstPaneRect.left
+        : firstPaneRect.top;
+
+    dragStartResizerPosition = resizerCenter - firstPaneStart;
+
     document.addEventListener("mousemove", dragMove);
     document.addEventListener("mouseup", dragEnd);
   };
-
   const dragMove = (e: MouseEvent): void => {
     const mousePosition =
       state.configuration.direction === "horizontal" ? e.clientX : e.clientY;
@@ -108,10 +124,16 @@ function createSplitDragHandler(
     }
 
     if (offset !== 0) {
-      updateState((currentState) =>
-        resizeSplit(currentState, splitIndex, offset),
+      const newResizerPosition = dragStartResizerPosition + offset;
+
+      console.log("=======================================================");
+      console.log(
+        `Dragging split ${splitIndex}: newResizerPosition=${newResizerPosition}, offset=${offset}`,
       );
-      dragStartPosition = mousePosition;
+
+      updateState((currentState) =>
+        resizeSplit(currentState, splitIndex, newResizerPosition),
+      );
     }
   };
 
