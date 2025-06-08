@@ -12,6 +12,7 @@ const mainLayout = createResizableLayout({
     {
       element: document.getElementById("test-container-vertical")!,
       size: "3fr",
+      minSize: "12px",
     },
   ],
 });
@@ -25,6 +26,8 @@ const horizontalLayout = createResizableLayout({
       size: "1fr",
       minSize: "100px",
       maxSize: "300px",
+      collapsible: true,
+      collapsedSize: "25px",
     },
     {
       element: document.getElementById("horizontal_2")!,
@@ -94,5 +97,17 @@ document.getElementById("toggle-button")!.addEventListener("click", () => {
     mainLayout.deactivate();
     horizontalLayout.deactivate();
     verticalLayout.deactivate();
+  }
+});
+
+let collapsed = false;
+
+document.getElementById("collapse-button")!.addEventListener("click", () => {
+  if (collapsed) {
+    horizontalLayout.expand(0);
+    collapsed = false;
+  } else {
+    horizontalLayout.collapse(0);
+    collapsed = true;
   }
 });

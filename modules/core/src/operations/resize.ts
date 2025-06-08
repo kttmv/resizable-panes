@@ -1,6 +1,7 @@
 import { mapSizeDefinition, resolveSize } from "../core/size-utils";
 import { getSplitPanes } from "../core/state";
 import type { LayoutState } from "../core/types";
+import { collapsePane, expandPane } from "./pane-operations";
 
 export function resizeSplit(
   state: LayoutState,
@@ -36,6 +37,28 @@ export function resizeSplit(
 
   let finalSizeA = newSizeA;
   let finalSizeB = newSizeB;
+
+  // Collapsing logic: if pane is collapsible and dragged below half min size, collapse it
+  const shouldCollapseA =
+    paneA.collapsible && !paneA.collapsed && finalSizeA <= minSizeA / 2;
+  const shouldCollapseB =
+    paneB.collapsible && !paneB.collapsed && finalSizeB <= minSizeB / 2;
+  if (shouldCollapseA) {
+    return collapsePane(state, split.paneIndices[0]);
+  } else if (shouldCollapseB) {
+    return collapsePane(state, split.paneIndices[1]);
+  }
+
+  // Expanding logic: if collapsed pane is resized for more than half its min size, expand it
+  const shouldExpandA =
+    paneA.collapsible && paneA.collapsed && finalSizeA > minSizeA / 2;
+  const shouldExpandB =
+    paneB.collapsible && paneB.collapsed && finalSizeB > minSizeB / 2;
+  if (shouldExpandA) {
+    return expandPane(state, split.paneIndices[0]);
+  } else if (shouldExpandB) {
+    return expandPane(state, split.paneIndices[1]);
+  }
 
   const snapOffset = state.configuration.snapOffset;
   if (snapOffset > 0) {

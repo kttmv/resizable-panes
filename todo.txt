@@ -1,0 +1,3 @@
+- override cursor
+- override resizer classes
+- touch support

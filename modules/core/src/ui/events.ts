@@ -115,6 +115,7 @@ function createSplitDragHandler(
 
     document.body.style.userSelect = "none";
   };
+
   const dragMove = (e: MouseEvent): void => {
     const mousePosition =
       state.configuration.direction === "horizontal" ? e.clientX : e.clientY;
