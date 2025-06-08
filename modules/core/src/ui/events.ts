@@ -112,6 +112,8 @@ function createSplitDragHandler(
 
     document.addEventListener("mousemove", dragMove);
     document.addEventListener("mouseup", dragEnd);
+
+    document.body.style.userSelect = "none";
   };
   const dragMove = (e: MouseEvent): void => {
     const mousePosition =
@@ -140,6 +142,8 @@ function createSplitDragHandler(
   const dragEnd = (): void => {
     document.removeEventListener("mousemove", dragMove);
     document.removeEventListener("mouseup", dragEnd);
+
+    document.body.style.userSelect = "";
   };
 
   return dragStart;
