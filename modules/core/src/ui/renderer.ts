@@ -20,13 +20,6 @@ function resetContainerStyles(style: CSSStyleDeclaration): void {
 }
 
 function applyGridLayout(state: LayoutState, style: CSSStyleDeclaration): void {
-  style.display = "grid";
-
-  const isHorizontal = state.configuration.direction === "horizontal";
-  const templateProperty = isHorizontal
-    ? "gridTemplateColumns"
-    : "gridTemplateRows";
-
   const template = state.splits
     .map((_split, index) => {
       const [paneA, paneB] = getSplitPanes(state, index);
@@ -45,5 +38,12 @@ function applyGridLayout(state: LayoutState, style: CSSStyleDeclaration): void {
     .flat()
     .join(" ");
 
-  style[templateProperty] = template;
+  const isHorizontal = state.configuration.direction === "horizontal";
+  const gridTemplateProperty = isHorizontal
+    ? "gridTemplateColumns"
+    : "gridTemplateRows";
+
+  style.display = "grid";
+  style[gridTemplateProperty] = template;
+  style.overflow = "auto";
 }

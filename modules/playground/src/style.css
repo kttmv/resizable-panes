@@ -19,21 +19,6 @@
 
 #test-container {
   height: 90vh;
-  display: flex;
-  flex-direction: column;
-}
-
-#test-container-horizontal {
-  display: flex;
-  height: 100%;
-  width: 100vw;
-}
-
-#test-container-vertical {
-  display: flex;
-  flex-direction: column;
-  height: 65vh;
-  overflow: hidden;
 }
 
 #horizontal_1,
@@ -53,6 +38,7 @@
 }
 #horizontal_3 {
   background-color: bisque;
+  overflow: auto;
 }
 #horizontal_4 {
   background-color: cadetblue;

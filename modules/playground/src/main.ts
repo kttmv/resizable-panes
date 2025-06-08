@@ -7,10 +7,11 @@ const mainLayout = createResizableLayout({
   panes: [
     {
       element: document.getElementById("test-container-horizontal")!,
-      size: "3fr",
+      size: "1fr",
     },
     {
       element: document.getElementById("test-container-vertical")!,
+      size: "3fr",
     },
   ],
 });
