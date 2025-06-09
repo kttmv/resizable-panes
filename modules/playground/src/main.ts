@@ -20,6 +20,7 @@ const mainLayout = createResizableLayout({
 const horizontalLayout = createResizableLayout({
   container: document.getElementById("test-container-horizontal")!,
   direction: "horizontal",
+  snapThreshold: 0,
   panes: [
     {
       element: document.getElementById("horizontal_1")!,
@@ -52,14 +53,14 @@ const horizontalLayout = createResizableLayout({
 const verticalLayout = createResizableLayout({
   container: document.getElementById("test-container-vertical")!,
   direction: "vertical",
-  dragInterval: 5, // Moves in 5px increments
-  snapOffset: 15, // Snaps to min/max when within 15px
+  dragInterval: 5,
+  snapThreshold: 0,
   panes: [
     {
       element: document.getElementById("vertical_1")!,
-      size: "1fr",
+      size: "150px",
       minSize: "50px",
-      maxSize: "150px",
+      maxSize: "250px",
     },
     {
       element: document.getElementById("vertical_2")!,

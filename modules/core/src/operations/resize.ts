@@ -19,128 +19,79 @@ export function resizeSplit(
   const currentSizeA = resolveSize(paneA.currentSize, state);
   const currentSizeB = resolveSize(paneB.currentSize, state);
 
-  console.log(
-    `Resizing split ${splitIndex}: newResizerPosition=${newResizerPosition}, resizerSize=${resizerSize}, currentSizeA=${currentSizeA}, currentSizeB=${currentSizeB}`,
-  );
-
-  const newSizeA = newResizerPosition - resizerSize / 2;
-  const newSizeB = currentSizeA + currentSizeB - newSizeA;
-
-  console.log(
-    `Calculated new sizes: newSizeA=${newSizeA}, newSizeB=${newSizeB}`,
-  );
-
   const minSizeA = resolveSize(paneA.minSize, state);
   const minSizeB = resolveSize(paneB.minSize, state);
   const maxSizeA = resolveSize(paneA.maxSize, state);
   const maxSizeB = resolveSize(paneB.maxSize, state);
 
-  let finalSizeA = newSizeA;
-  let finalSizeB = newSizeB;
+  let finalSizeA = newResizerPosition - resizerSize / 2;
+  let finalSizeB = currentSizeA + currentSizeB - finalSizeA;
 
-  // Collapsing logic: if pane is collapsible and dragged below half min size, collapse it
-  const shouldCollapseA =
-    paneA.collapsible && !paneA.collapsed && finalSizeA <= minSizeA / 2;
-  const shouldCollapseB =
-    paneB.collapsible && !paneB.collapsed && finalSizeB <= minSizeB / 2;
-  if (shouldCollapseA) {
-    return collapsePane(state, split.paneIndices[0]);
-  } else if (shouldCollapseB) {
-    return collapsePane(state, split.paneIndices[1]);
+  // Collapse/Expand logic
+  const collapseExpand = [
+    { pane: paneA, idx: split.paneIndices[0], size: finalSizeA, min: minSizeA },
+    { pane: paneB, idx: split.paneIndices[1], size: finalSizeB, min: minSizeB },
+  ];
+  for (const { pane, idx, size, min } of collapseExpand) {
+    if (pane.collapsible && !pane.collapsed && size <= min / 2)
+      return collapsePane(state, idx);
+    if (pane.collapsible && pane.collapsed && size > min / 2)
+      return expandPane(state, idx);
   }
 
-  // Expanding logic: if collapsed pane is resized for more than half its min size, expand it
-  const shouldExpandA =
-    paneA.collapsible && paneA.collapsed && finalSizeA > minSizeA / 2;
-  const shouldExpandB =
-    paneB.collapsible && paneB.collapsed && finalSizeB > minSizeB / 2;
-  if (shouldExpandA) {
-    return expandPane(state, split.paneIndices[0]);
-  } else if (shouldExpandB) {
-    return expandPane(state, split.paneIndices[1]);
+  // Snap logic
+  const snapToBounds = (
+    size: number,
+    minSize: number,
+    maxSize: number,
+    snapThreshold: number,
+  ) =>
+    Math.abs(size - minSize) <= snapThreshold
+      ? minSize
+      : Math.abs(size - maxSize) <= snapThreshold
+        ? maxSize
+        : size;
+
+  const snapThreshold = state.configuration.snapThreshold;
+  if (snapThreshold > 0) {
+    const originalSizeA = finalSizeA;
+    const originalSizeB = finalSizeB;
+
+    finalSizeA = snapToBounds(finalSizeA, minSizeA, maxSizeA, snapThreshold);
+    finalSizeB += originalSizeA - finalSizeA;
+
+    finalSizeB = snapToBounds(finalSizeB, minSizeB, maxSizeB, snapThreshold);
+    finalSizeA += originalSizeB - finalSizeB;
   }
 
-  const snapOffset = state.configuration.snapOffset;
-  if (snapOffset > 0) {
-    // Check if pane A should snap to min/max
-    if (Math.abs(finalSizeA - minSizeA) <= snapOffset) {
-      const snapOffsetA = finalSizeA - minSizeA;
-      finalSizeA = minSizeA;
-      finalSizeB = finalSizeB + snapOffsetA;
+  const isWithinBounds =
+    finalSizeA >= minSizeA &&
+    finalSizeB >= minSizeB &&
+    finalSizeA <= maxSizeA &&
+    finalSizeB <= maxSizeB;
 
-      console.log(
-        `Pane A snapped to min size: finalSizeA=${finalSizeA}, finalSizeB=${finalSizeB}`,
-      );
-    } else if (Math.abs(finalSizeA - maxSizeA) <= snapOffset) {
-      const snapOffsetA = finalSizeA - maxSizeA;
-      finalSizeA = maxSizeA;
-      finalSizeB = finalSizeB + snapOffsetA;
-
-      console.log(
-        `Pane A snapped to max size: finalSizeA=${finalSizeA}, finalSizeB=${finalSizeB}`,
-      );
-    }
-
-    // Check if pane B should snap to min/max
-    if (Math.abs(finalSizeB - minSizeB) <= snapOffset) {
-      const snapOffsetB = finalSizeB - minSizeB;
-      finalSizeB = minSizeB;
-      finalSizeA = finalSizeA + snapOffsetB;
-
-      console.log(
-        `Pane B snapped to min size: finalSizeA=${finalSizeA}, finalSizeB=${finalSizeB}`,
-      );
-    } else if (Math.abs(finalSizeB - maxSizeB) <= snapOffset) {
-      const snapOffsetB = finalSizeB - maxSizeB;
-      finalSizeB = maxSizeB;
-      finalSizeA = finalSizeA + snapOffsetB;
-
-      console.log(
-        `Pane B snapped to max size: finalSizeA=${finalSizeA}, finalSizeB=${finalSizeB}`,
-      );
-    }
-  }
-
-  if (
-    finalSizeA < minSizeA ||
-    finalSizeB < minSizeB ||
-    finalSizeA > maxSizeA ||
-    finalSizeB > maxSizeB
-  ) {
-    console.warn(
-      `Invalid sizes after resizing: finalSizeA=${finalSizeA}, finalSizeB=${finalSizeB}, minSizeA=${minSizeA}, minSizeB=${minSizeB}, maxSizeA=${maxSizeA}, maxSizeB=${maxSizeB}`,
-    );
+  if (!isWithinBounds) {
     return state;
   }
 
-  const factorA = finalSizeA / currentSizeA;
-  const factorB = finalSizeB / currentSizeB;
-
-  console.log(
-    `Resize factors: factorA=${factorA}, factorB=${factorB}, currentSizeA=${currentSizeA}, currentSizeB=${currentSizeB}`,
-  );
-
-  const newPaneSizeA = mapSizeDefinition(
-    paneA.currentSize,
-    (value) => value * factorA,
-  );
-  const newPaneSizeB = mapSizeDefinition(
-    paneB.currentSize,
-    (value) => value * factorB,
-  );
-
-  console.log(
-    `Final sizes after mapping: newPaneSizeA=${newPaneSizeA}, newPaneSizeB=${newPaneSizeB}`,
-  );
+  // State update
+  const scalingFactorA = finalSizeA / currentSizeA;
+  const scalingFactorB = finalSizeB / currentSizeB;
 
   const updatedPanes = [...state.panes];
   updatedPanes[split.paneIndices[0]] = {
     ...paneA,
-    currentSize: newPaneSizeA,
+    currentSize: mapSizeDefinition(
+      paneA.currentSize,
+      (value) => value * scalingFactorA,
+    ),
   };
   updatedPanes[split.paneIndices[1]] = {
     ...paneB,
-    currentSize: newPaneSizeB,
+    currentSize: mapSizeDefinition(
+      paneB.currentSize,
+      (value) => value * scalingFactorB,
+    ),
   };
 
   return {

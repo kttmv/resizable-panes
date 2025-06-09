@@ -21,7 +21,7 @@ export interface LayoutConfiguration {
   panes: PaneConfiguration[];
   dragInterval?: number;
   dragAreaSize?: number;
-  snapOffset?: number;
+  snapThreshold?: number;
 }
 
 // Internal state types

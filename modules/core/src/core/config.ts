@@ -8,13 +8,13 @@ import type {
 export const DEFAULT_LAYOUT_CONFIG: Required<
   Pick<
     LayoutConfiguration,
-    "direction" | "dragInterval" | "dragAreaSize" | "snapOffset"
+    "direction" | "dragInterval" | "dragAreaSize" | "snapThreshold"
   >
 > = {
   direction: DEFAULTS.DIRECTION,
   dragInterval: DEFAULTS.DRAG_INTERVAL,
   dragAreaSize: DEFAULTS.DRAG_AREA_SIZE,
-  snapOffset: DEFAULTS.SNAP_OFFSET,
+  snapThreshold: DEFAULTS.SNAP_THRESHOLD,
 };
 
 export const DEFAULT_PANE_CONFIG: Required<
