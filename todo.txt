@@ -1,3 +1,4 @@
 - override cursor
 - override resizer classes
 - touch support
+- reset size on resizer double click

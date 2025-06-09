@@ -40,27 +40,23 @@ export function resizeSplit(
   }
 
   // Snap logic
-  const snapToBounds = (
-    size: number,
-    minSize: number,
-    maxSize: number,
-    snapThreshold: number,
-  ) =>
-    Math.abs(size - minSize) <= snapThreshold
-      ? minSize
-      : Math.abs(size - maxSize) <= snapThreshold
-        ? maxSize
-        : size;
-
   const snapThreshold = state.configuration.snapThreshold;
   if (snapThreshold > 0) {
+    const snapToBounds = (size: number, minSize: number, maxSize: number) => {
+      return Math.abs(size - minSize) <= snapThreshold
+        ? minSize
+        : Math.abs(size - maxSize) <= snapThreshold
+          ? maxSize
+          : size;
+    };
+
     const originalSizeA = finalSizeA;
     const originalSizeB = finalSizeB;
 
-    finalSizeA = snapToBounds(finalSizeA, minSizeA, maxSizeA, snapThreshold);
+    finalSizeA = snapToBounds(finalSizeA, minSizeA, maxSizeA);
     finalSizeB += originalSizeA - finalSizeA;
 
-    finalSizeB = snapToBounds(finalSizeB, minSizeB, maxSizeB, snapThreshold);
+    finalSizeB = snapToBounds(finalSizeB, minSizeB, maxSizeB);
     finalSizeA += originalSizeB - finalSizeB;
   }
 

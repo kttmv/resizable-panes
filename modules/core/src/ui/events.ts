@@ -2,213 +2,148 @@ import { findSplitByPane } from "../core/state";
 import type { LayoutState, UpdateStateFunction } from "../core/types";
 import { resizeSplit } from "../operations/index";
 
-// Store for event listeners to enable cleanup
-const eventListenerStore = new WeakMap<
-  HTMLElement,
-  {
-    mousemove: (e: MouseEvent) => void;
-    mouseleave: () => void;
-    mousedown: (e: MouseEvent) => void;
-  }
->();
+const eventListenerStore = new WeakMap<HTMLElement, Array<() => void>>();
 
 export function attachEventListeners(
   state: LayoutState,
   updateState: UpdateStateFunction,
 ): void {
-  attachResizerListeners(state, updateState);
-  attachDragAreaListeners(state, updateState);
+  // Attach resizer listeners
+  state.splits.forEach((split, index) => {
+    const handler = createDragHandler(state, index, updateState);
+    split.resizerElement.addEventListener("mousedown", handler);
+  });
+
+  // Attach drag area listeners if enabled
+  if (state.configuration.dragAreaSize > 0) {
+    state.panes.forEach((pane, index) => {
+      const handlers = createDragAreaHandlers(state, index, updateState);
+      const element = pane.element;
+
+      element.addEventListener("mousemove", handlers.mousemove);
+      element.addEventListener("mouseleave", handlers.mouseleave);
+      element.addEventListener("mousedown", handlers.mousedown);
+
+      eventListenerStore.set(element, [
+        () => element.removeEventListener("mousemove", handlers.mousemove),
+        () => element.removeEventListener("mouseleave", handlers.mouseleave),
+        () => element.removeEventListener("mousedown", handlers.mousedown),
+      ]);
+    });
+  }
 }
 
 export function detachEventListeners(state: LayoutState): void {
-  for (const split of state.splits) {
-    const element = split.resizerElement;
-    element.removeEventListener("mousedown", () => {});
-    element.style.cursor = "";
-  }
+  state.splits.forEach((split) => (split.resizerElement.style.cursor = ""));
 
-  for (const pane of state.panes) {
+  state.panes.forEach((pane) => {
     const element = pane.element;
-    const listeners = eventListenerStore.get(element);
+    const cleanupFunctions = eventListenerStore.get(element);
 
-    if (listeners) {
-      element.removeEventListener("mousemove", listeners.mousemove);
-      element.removeEventListener("mouseleave", listeners.mouseleave);
-      element.removeEventListener("mousedown", listeners.mousedown);
+    if (cleanupFunctions) {
+      cleanupFunctions.forEach((cleanup) => cleanup());
       element.style.cursor = "";
       eventListenerStore.delete(element);
     }
-  }
+  });
 }
 
-function attachResizerListeners(
-  state: LayoutState,
-  updateState: UpdateStateFunction,
-): void {
-  for (let splitIndex = 0; splitIndex < state.splits.length; splitIndex++) {
-    const split = state.splits[splitIndex];
-    const dragHandler = createSplitDragHandler(state, splitIndex, updateState);
-
-    split.resizerElement.addEventListener("mousedown", dragHandler);
-  }
-}
-
-function attachDragAreaListeners(
-  state: LayoutState,
-  updateState: UpdateStateFunction,
-): void {
-  if (state.configuration.dragAreaSize <= 0) return;
-
-  for (let paneIndex = 0; paneIndex < state.panes.length; paneIndex++) {
-    const pane = state.panes[paneIndex];
-    const element = pane.element;
-
-    const dragAreaHandler = createDragAreaHandler(
-      state,
-      paneIndex,
-      element,
-      updateState,
-    );
-
-    eventListenerStore.set(element, {
-      mousemove: dragAreaHandler.handleMouseMove,
-      mouseleave: dragAreaHandler.handleMouseLeave,
-      mousedown: dragAreaHandler.handleMouseDown,
-    });
-
-    element.addEventListener("mousemove", dragAreaHandler.handleMouseMove);
-    element.addEventListener("mouseleave", dragAreaHandler.handleMouseLeave);
-    element.addEventListener("mousedown", dragAreaHandler.handleMouseDown);
-  }
-}
-
-function createSplitDragHandler(
+function createDragHandler(
   state: LayoutState,
   splitIndex: number,
   updateState: UpdateStateFunction,
 ) {
-  let dragStartPosition: number;
-  let dragStartResizerPosition: number;
-
-  const dragStart = (e: MouseEvent): void => {
-    dragStartPosition =
-      state.configuration.direction === "horizontal" ? e.clientX : e.clientY;
+  return (e: MouseEvent) => {
+    const isHorizontal = state.configuration.direction === "horizontal";
+    const startPosition = isHorizontal ? e.clientX : e.clientY;
 
     const split = state.splits[splitIndex];
     const resizerRect = split.resizerElement.getBoundingClientRect();
-    const resizerCenter =
-      state.configuration.direction === "horizontal"
-        ? resizerRect.left + resizerRect.width / 2
-        : resizerRect.top + resizerRect.height / 2;
+    const resizerCenter = isHorizontal
+      ? resizerRect.left + resizerRect.width / 2
+      : resizerRect.top + resizerRect.height / 2;
 
     const firstPane = state.panes[split.paneIndices[0]];
     const firstPaneRect = firstPane.element.getBoundingClientRect();
-    const firstPaneStart =
-      state.configuration.direction === "horizontal"
-        ? firstPaneRect.left
-        : firstPaneRect.top;
+    const firstPaneStart = isHorizontal
+      ? firstPaneRect.left
+      : firstPaneRect.top;
+    const startResizerPosition = resizerCenter - firstPaneStart;
 
-    dragStartResizerPosition = resizerCenter - firstPaneStart;
+    const dragMove = (e: MouseEvent) => {
+      const mousePosition = isHorizontal ? e.clientX : e.clientY;
+      let offset = mousePosition - startPosition;
+
+      const dragInterval = state.configuration.dragInterval;
+      if (dragInterval > 1) {
+        offset = Math.round(offset / dragInterval) * dragInterval;
+      }
+
+      if (offset !== 0) {
+        const newResizerPosition = startResizerPosition + offset;
+        updateState((currentState) =>
+          resizeSplit(currentState, splitIndex, newResizerPosition),
+        );
+      }
+    };
+
+    const dragEnd = () => {
+      document.removeEventListener("mousemove", dragMove);
+      document.removeEventListener("mouseup", dragEnd);
+      document.body.style.userSelect = "";
+    };
 
     document.addEventListener("mousemove", dragMove);
     document.addEventListener("mouseup", dragEnd);
-
     document.body.style.userSelect = "none";
   };
-
-  const dragMove = (e: MouseEvent): void => {
-    const mousePosition =
-      state.configuration.direction === "horizontal" ? e.clientX : e.clientY;
-    let offset = mousePosition - dragStartPosition;
-
-    const dragInterval = state.configuration.dragInterval;
-    if (dragInterval > 1) {
-      offset = Math.round(offset / dragInterval) * dragInterval;
-    }
-
-    if (offset !== 0) {
-      const newResizerPosition = dragStartResizerPosition + offset;
-
-      console.log("=======================================================");
-      console.log(
-        `Dragging split ${splitIndex}: newResizerPosition=${newResizerPosition}, offset=${offset}`,
-      );
-
-      updateState((currentState) =>
-        resizeSplit(currentState, splitIndex, newResizerPosition),
-      );
-    }
-  };
-
-  const dragEnd = (): void => {
-    document.removeEventListener("mousemove", dragMove);
-    document.removeEventListener("mouseup", dragEnd);
-
-    document.body.style.userSelect = "";
-  };
-
-  return dragStart;
 }
 
-function createDragAreaHandler(
+function createDragAreaHandlers(
   state: LayoutState,
   paneIndex: number,
-  element: HTMLElement,
   updateState: UpdateStateFunction,
 ) {
   const { leftSplit, rightSplit } = findSplitByPane(state, paneIndex);
 
-  const isInDragArea = (
-    e: MouseEvent,
-  ): { inArea: boolean; splitIndex: number } => {
+  const getSplitInDragArea = (e: MouseEvent, element: HTMLElement) => {
     const rect = element.getBoundingClientRect();
-    const mousePos = {
-      x: e.clientX - rect.left,
-      y: e.clientY - rect.top,
-    };
-
+    const isHorizontal = state.configuration.direction === "horizontal";
+    const mousePos = isHorizontal
+      ? e.clientX - rect.left
+      : e.clientY - rect.top;
+    const size = isHorizontal ? rect.width : rect.height;
     const dragAreaSize = state.configuration.dragAreaSize;
-    const size =
-      state.configuration.direction === "horizontal" ? rect.width : rect.height;
-    const position =
-      state.configuration.direction === "horizontal" ? mousePos.x : mousePos.y;
 
-    if (leftSplit !== undefined && position <= dragAreaSize) {
-      return { inArea: true, splitIndex: leftSplit };
-    }
-
-    if (rightSplit !== undefined && position >= size - dragAreaSize) {
-      return { inArea: true, splitIndex: rightSplit };
-    }
-
-    return { inArea: false, splitIndex: -1 };
-  };
-
-  const handleMouseMove = (e: MouseEvent): void => {
-    const { inArea } = isInDragArea(e);
-    const cursor = inArea
-      ? state.configuration.direction === "horizontal"
-        ? "col-resize"
-        : "row-resize"
-      : "";
-    element.style.cursor = cursor;
-  };
-
-  const handleMouseLeave = (): void => {
-    element.style.cursor = "";
-  };
-
-  const handleMouseDown = (e: MouseEvent): void => {
-    const { inArea, splitIndex } = isInDragArea(e);
-    if (!inArea) return;
-
-    const dragHandler = createSplitDragHandler(state, splitIndex, updateState);
-    dragHandler(e);
+    if (leftSplit !== undefined && mousePos <= dragAreaSize) return leftSplit;
+    if (rightSplit !== undefined && mousePos >= size - dragAreaSize)
+      return rightSplit;
+    return -1;
   };
 
   return {
-    handleMouseMove,
-    handleMouseLeave,
-    handleMouseDown,
+    mousemove: (e: MouseEvent) => {
+      const element = e.currentTarget as HTMLElement;
+      const splitIndex = getSplitInDragArea(e, element);
+      const cursor =
+        splitIndex >= 0
+          ? state.configuration.direction === "horizontal"
+            ? "col-resize"
+            : "row-resize"
+          : "";
+      element.style.cursor = cursor;
+    },
+
+    mouseleave: (e: MouseEvent) => {
+      (e.currentTarget as HTMLElement).style.cursor = "";
+    },
+
+    mousedown: (e: MouseEvent) => {
+      const element = e.currentTarget as HTMLElement;
+      const splitIndex = getSplitInDragArea(e, element);
+      if (splitIndex >= 0) {
+        createDragHandler(state, splitIndex, updateState)(e);
+      }
+    },
   };
 }
