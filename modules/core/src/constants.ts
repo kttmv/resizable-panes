@@ -1,8 +1,8 @@
 export const CSS_CLASSES = {
-  RESIZER_HORIZONTAL: "resizable-panes-resizer-horizontal",
-  RESIZER_VERTICAL: "resizable-panes-resizer-vertical",
-  CONTAINER: "resizable-panes-container",
-  PANE: "resizable-panes-pane",
+  RESIZER_HORIZONTAL: "origami-grids-resizer-horizontal",
+  RESIZER_VERTICAL: "origami-grids-resizer-vertical",
+  CONTAINER: "origami-grids-container",
+  PANE: "origami-grids-pane",
 } as const;
 
 export const DEFAULTS = {

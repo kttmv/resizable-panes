@@ -1,5 +1,5 @@
 {
-  "name": "@resizable-panes/core",
+  "name": "@origami-grids/core",
   "version": "0.0.1",
   "type": "module",
   "types": "dist/index.d.ts",

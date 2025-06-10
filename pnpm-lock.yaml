@@ -44,7 +44,7 @@ importers:
 
   modules/playground:
     dependencies:
-      '@resizable-panes/core':
+      '@origami-grids/core':
         specifier: workspace:*
         version: link:../core
 

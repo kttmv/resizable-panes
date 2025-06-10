@@ -1,11 +1,11 @@
-.resizable-panes-resizer-horizontal {
+.origami-grids-resizer-horizontal {
   cursor: col-resize;
   background-color: gray;
   width: 4px;
   min-width: 4px;
 }
 
-.resizable-panes-resizer-vertical {
+.origami-grids-resizer-vertical {
   cursor: row-resize;
   background-color: gray;
   height: 4px;

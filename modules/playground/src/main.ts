@@ -1,4 +1,4 @@
-import { createResizableLayout } from "@resizable-panes/core";
+import { createResizableLayout } from "@origami-grids/core";
 import "./style.css";
 
 const mainLayout = createResizableLayout({

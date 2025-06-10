@@ -9,6 +9,6 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@resizable-panes/core": "workspace:*"
+    "@origami-grids/core": "workspace:*"
   }
 }

@@ -1,5 +1,5 @@
 {
-  "name": "resizable-panes-monorepo",
+  "name": "origami-grids-monorepo",
   "private": true,
   "scripts": {
     "build": "npm run build:core",
