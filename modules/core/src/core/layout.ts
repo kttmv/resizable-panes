@@ -1,24 +1,15 @@
-import {
-  collapsePane,
-  expandPane,
-  resizePane,
-  updateConstraints,
-} from "../operations/index";
+import { UpdateStateFunction } from "../types/internal";
+import { GridConfiguration, OrigamiGridInstance } from "../types/public";
 import { attachEventListeners, detachEventListeners } from "../ui/events";
 import { renderLayout } from "../ui/renderer";
-import { insertResizers, removeResizers } from "../ui/resizers";
-import { validateLayoutConfiguration } from "./config";
+import { removeResizers } from "../ui/resizers";
+import { validateGridConfiguration } from "./config";
 import { activateLayout, createInitialState, deactivateLayout } from "./state";
-import type {
-  LayoutConfiguration,
-  ResizableLayoutInstance,
-  UpdateStateFunction,
-} from "./types";
 
 export function createResizableLayout(
-  config: LayoutConfiguration,
-): ResizableLayoutInstance {
-  validateLayoutConfiguration(config);
+  config: GridConfiguration,
+): OrigamiGridInstance {
+  validateGridConfiguration(config);
 
   let state = createInitialState(config);
 
@@ -34,52 +25,42 @@ export function createResizableLayout(
 
   return {
     activate() {
-      insertResizers(state);
       updateState(activateLayout);
     },
 
     deactivate() {
-      removeResizers(state);
       updateState(deactivateLayout);
-    },
-
-    resize(paneIndex: number, newSize) {
-      updateState((currentState) =>
-        resizePane(currentState, paneIndex, newSize),
-      );
-    },
-
-    collapse(paneIndex: number) {
-      updateState((currentState) => collapsePane(currentState, paneIndex));
-    },
-
-    expand(paneIndex: number) {
-      updateState((currentState) => expandPane(currentState, paneIndex));
-    },
-
-    setMinSize(paneIndex: number, minSize) {
-      updateState((currentState) =>
-        updateConstraints(currentState, paneIndex, { minSize }),
-      );
-    },
-
-    setMaxSize(paneIndex: number, maxSize) {
-      updateState((currentState) =>
-        updateConstraints(currentState, paneIndex, { maxSize }),
-      );
-    },
-
-    getState() {
-      return { ...state };
-    },
-
-    refresh() {
-      renderLayout(state);
     },
 
     destroy() {
       detachEventListeners(state);
       removeResizers(state);
+    },
+
+    resize(axis, index, newSize) {
+      // updateState((currentState) =>
+      //   resizePane(currentState, paneIndex, newSize),
+      // );
+    },
+
+    collapse(axis, index) {
+      // updateState((currentState) => collapsePane(currentState, paneIndex));
+    },
+
+    expand(axis, index) {
+      // updateState((currentState) => expandPane(currentState, paneIndex));
+    },
+
+    setMinSize(axis, index, minSize) {
+      // updateState((currentState) =>
+      //   updateConstraints(currentState, paneIndex, { minSize }),
+      // );
+    },
+
+    setMaxSize(axis, index, maxSize) {
+      // updateState((currentState) =>
+      //   updateConstraints(currentState, paneIndex, { maxSize }),
+      // );
     },
   };
 }

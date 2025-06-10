@@ -1,8 +1,8 @@
 import { DEFAULTS, LIMITS } from "../constants";
 import type {
   LayoutConfiguration,
+  OrigamiSizeDefinition,
   PaneConfiguration,
-  SizeDefinition,
 } from "./types";
 
 export const DEFAULT_LAYOUT_CONFIG: Required<
@@ -58,7 +58,7 @@ export function normalizePaneConfiguration(
 }
 
 // Validation functions
-export function validateLayoutConfiguration(config: LayoutConfiguration): void {
+export function validateGridConfiguration(config: LayoutConfiguration): void {
   if (!config.container) {
     throw new Error("Container element is required");
   }
@@ -113,6 +113,6 @@ export function validatePaneConfiguration(config: PaneConfiguration): void {
   }
 }
 
-function isValidSizeDefinition(size: string): size is SizeDefinition {
+function isValidSizeDefinition(size: string): size is OrigamiSizeDefinition {
   return size.endsWith("px") || size.endsWith("fr");
 }

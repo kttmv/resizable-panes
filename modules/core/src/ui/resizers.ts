@@ -6,8 +6,8 @@ export function createResizerElement(config: LayoutConfiguration): HTMLElement {
 
   const className =
     config.direction === "horizontal"
-      ? CSS_CLASSES.RESIZER_HORIZONTAL
-      : CSS_CLASSES.RESIZER_VERTICAL;
+      ? CSS_CLASSES.RESIZER_COLUMN
+      : CSS_CLASSES.RESIZER_ROW;
 
   resizerElement.className = className;
 

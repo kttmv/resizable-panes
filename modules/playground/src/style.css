@@ -1,11 +1,11 @@
-.origami-grids-resizer-horizontal {
+.origami-grids-resizer-column {
   cursor: col-resize;
   background-color: gray;
   width: 4px;
   min-width: 4px;
 }
 
-.origami-grids-resizer-vertical {
+.origami-grids-resizer-row {
   cursor: row-resize;
   background-color: gray;
   height: 4px;

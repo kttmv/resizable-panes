@@ -2,3 +2,6 @@
 - override resizer classes
 - touch support
 - reset size on resizer double click
+- add support for % unit
+- onCollapse/onExpand
+- collapse threshold

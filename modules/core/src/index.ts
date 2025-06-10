@@ -1,8 +1,3 @@
 export { createResizableLayout } from "./core/layout";
-export type {
-  Direction,
-  LayoutConfiguration,
-  PaneConfiguration,
-  ResizableLayoutInstance,
-  SizeDefinition,
-} from "./core/types";
+
+export type * from "./types/public";

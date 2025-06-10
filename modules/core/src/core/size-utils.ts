@@ -1,4 +1,4 @@
-import type { LayoutState, SizeDefinition } from "./types";
+import type { LayoutState, OrigamiSizeDefinition } from "./types";
 
 export function parsePx(value: string): number | undefined {
   if (!value.endsWith("px")) return undefined;
@@ -23,23 +23,26 @@ export function isFrSize(value: string): value is `${number}fr` {
 }
 
 export function mapSizeDefinition(
-  size: SizeDefinition,
+  size: OrigamiSizeDefinition,
   mapper: (value: number) => number,
-): SizeDefinition {
+): OrigamiSizeDefinition {
   const unit = size.endsWith("px") ? "px" : "fr";
   const num = Number(size.slice(0, -unit.length));
   const newValue = mapper(num);
-  return `${newValue}${unit}` as SizeDefinition;
+  return `${newValue}${unit}` as OrigamiSizeDefinition;
 }
 
 export function createSizeDefinition(
   value: number,
   unit: "px" | "fr",
-): SizeDefinition {
-  return `${value}${unit}` as SizeDefinition;
+): OrigamiSizeDefinition {
+  return `${value}${unit}` as OrigamiSizeDefinition;
 }
 
-export function resolveSize(size: SizeDefinition, state: LayoutState): number {
+export function resolveSize(
+  size: OrigamiSizeDefinition,
+  state: LayoutState,
+): number {
   const pxValue = parsePx(size);
   if (pxValue !== undefined) {
     return pxValue;

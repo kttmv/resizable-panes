@@ -6,8 +6,8 @@ import {
 import type {
   LayoutConfiguration,
   LayoutState,
+  OrigamiSizeDefinition,
   PaneState,
-  SizeDefinition,
   SplitState,
 } from "./types";
 
@@ -44,7 +44,7 @@ export function createInitialState(config: LayoutConfiguration): LayoutState {
 export function updatePaneSize(
   state: LayoutState,
   paneIndex: number,
-  newSize: SizeDefinition,
+  newSize: OrigamiSizeDefinition,
 ): LayoutState {
   const newPanes = [...state.panes];
   newPanes[paneIndex] = {
@@ -78,7 +78,10 @@ export function updatePaneCollapsed(
 export function updatePaneConstraints(
   state: LayoutState,
   paneIndex: number,
-  constraints: { minSize?: SizeDefinition; maxSize?: SizeDefinition },
+  constraints: {
+    minSize?: OrigamiSizeDefinition;
+    maxSize?: OrigamiSizeDefinition;
+  },
 ): LayoutState {
   const newPanes = [...state.panes];
   newPanes[paneIndex] = {

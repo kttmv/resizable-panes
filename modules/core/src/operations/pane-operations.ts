@@ -1,9 +1,9 @@
-import type { LayoutState, SizeDefinition } from "../core/types";
+import type { LayoutState, OrigamiSizeDefinition } from "../core/types";
 
 export function resizePane(
   state: LayoutState,
   paneIndex: number,
-  newSize: SizeDefinition,
+  newSize: OrigamiSizeDefinition,
 ): LayoutState {
   const updatedPanes = [...state.panes];
   updatedPanes[paneIndex] = {
