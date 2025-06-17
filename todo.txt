@@ -5,3 +5,4 @@
 - add support for % unit
 - onCollapse/onExpand
 - collapse threshold
+- reset layout

@@ -3,14 +3,11 @@ import { GridConfiguration, OrigamiGridInstance } from "../types/public";
 import { attachEventListeners, detachEventListeners } from "../ui/events";
 import { renderLayout } from "../ui/renderer";
 import { removeResizers } from "../ui/resizers";
-import { validateGridConfiguration } from "./config";
 import { activateLayout, createInitialState, deactivateLayout } from "./state";
 
 export function createResizableLayout(
   config: GridConfiguration,
 ): OrigamiGridInstance {
-  validateGridConfiguration(config);
-
   let state = createInitialState(config);
 
   const updateState: UpdateStateFunction = (updater) => {

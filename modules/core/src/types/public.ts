@@ -1,25 +1,46 @@
-export type SizeDefinition = `${number}px` | `${number}fr`;
 export type Axis = "row" | "column";
+export type SizeUnits = "fr" | "px";
 
-export type FoldConfiguration = {
-  size?: SizeDefinition;
-  minSize?: SizeDefinition;
-  maxSize?: SizeDefinition;
-  resizable?: boolean;
+export type TrackOptions = {
+  units?: SizeUnits;
+
+  size?: number;
+  minSize?: number;
+  maxSize?: number;
+
   collapsible?: boolean;
   collapsed?: boolean;
-  collapsedSize?: SizeDefinition;
+  collapsedSize?: number;
+
+  snapThreshold?: number;
+};
+
+export type TrackConfiguration = TrackOptions & {
+  a: number;
 };
 
 export type ResizerConfiguration = {
-  track: number;
   element: HTMLElement;
+
+  track: number;
+  axis: Axis;
 };
+
+const a = [
+  {
+    a: 1,
+    b: 2,
+  },
+  {},
+  { c: 3 },
+];
 
 export type GridConfiguration = {
   container: HTMLElement;
-  rows: number;
-  columns: number;
+
+  dragInterval?: number;
+  dragAreaSize?: number;
+
   resizers:
     | {
         horizontal: ResizerConfiguration[];
@@ -29,15 +50,18 @@ export type GridConfiguration = {
         horizontal?: ResizerConfiguration[];
         vertical: ResizerConfiguration[];
       };
-  foldsConfiguration?:
-    | { rows: FoldConfiguration[]; columns?: FoldConfiguration[] }
+
+  tracks?:
     | {
-        rows?: FoldConfiguration[];
-        columns: FoldConfiguration[];
+        default?: TrackOptions;
+        rows: TrackOptions[];
+        columns?: TrackOptions[];
+      }
+    | {
+        default?: TrackOptions;
+        rows?: TrackOptions[];
+        columns: TrackOptions[];
       };
-  dragInterval?: number;
-  dragAreaSize?: number;
-  snapThreshold?: number;
 };
 
 export interface OrigamiGridInstance {
@@ -46,12 +70,12 @@ export interface OrigamiGridInstance {
 
   destroy(): void;
 
-  resize(axis: Axis, index: number, newSize: SizeDefinition): void;
+  resize(axis: Axis, index: number, newSize: number): void;
 
   collapse(axis: Axis, index: number): void;
 
   expand(axis: Axis, rowIndex: number): void;
 
-  setMinSize(axis: Axis, index: number, minSize: SizeDefinition): void;
-  setMaxSize(axis: Axis, index: number, maxSize: SizeDefinition): void;
+  setMinSize(axis: Axis, index: number, minSize: number): void;
+  setMaxSize(axis: Axis, index: number, maxSize: number): void;
 }

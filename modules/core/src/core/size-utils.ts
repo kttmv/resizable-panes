@@ -1,66 +1,27 @@
-import type { LayoutState, OrigamiSizeDefinition } from "./types";
-
-export function parsePx(value: string): number | undefined {
-  if (!value.endsWith("px")) return undefined;
-  const num = value.slice(0, -2);
-  const n = Number(num);
-  return Number.isFinite(n) ? n : undefined;
-}
-
-export function parseFr(value: string): number | undefined {
-  if (!value.endsWith("fr")) return undefined;
-  const num = value.slice(0, -2);
-  const n = Number(num);
-  return Number.isFinite(n) ? n : undefined;
-}
-
-export function isPxSize(value: string): value is `${number}px` {
-  return parsePx(value) !== undefined;
-}
-
-export function isFrSize(value: string): value is `${number}fr` {
-  return parseFr(value) !== undefined;
-}
-
-export function mapSizeDefinition(
-  size: OrigamiSizeDefinition,
-  mapper: (value: number) => number,
-): OrigamiSizeDefinition {
-  const unit = size.endsWith("px") ? "px" : "fr";
-  const num = Number(size.slice(0, -unit.length));
-  const newValue = mapper(num);
-  return `${newValue}${unit}` as OrigamiSizeDefinition;
-}
-
-export function createSizeDefinition(
-  value: number,
-  unit: "px" | "fr",
-): OrigamiSizeDefinition {
-  return `${value}${unit}` as OrigamiSizeDefinition;
-}
+import { GridState } from "../types/internal";
+import { SizeUnits } from "../types/public";
 
 export function resolveSize(
-  size: OrigamiSizeDefinition,
-  state: LayoutState,
+  value: number,
+  units: SizeUnits,
+  state: GridState,
 ): number {
-  const pxValue = parsePx(size);
-  if (pxValue !== undefined) {
-    return pxValue;
+  if (units === "px") {
+    return value;
   }
 
-  const frValue = parseFr(size);
-  if (frValue !== undefined) {
-    return resolveFractionalSize(frValue, state);
+  if (units === "fr") {
+    return resolveFractionalSize(value, state);
   }
 
-  throw new Error(`Invalid size definition: ${size}`);
+  throw new Error(`Unsupported size units: ${units}`);
 }
 
-function resolveFractionalSize(frValue: number, state: LayoutState): number {
-  const totalPxFromPanes = state.panes.reduce((sum, pane) => {
-    const pxValue = parsePx(pane.currentSize);
-    return pxValue !== undefined ? sum + pxValue : sum;
-  }, 0);
+function resolveFractionalSize(value: number, state: GridState): number {
+  const totalFoldsPx = state.folds.reduce(
+    (sum, fold) => (fold.units === "px" ? sum + fold.size : sum),
+    0,
+  );
 
   const totalPxFromResizers = state.splits.reduce((sum, split) => {
     return sum + getElementSize(split.resizerElement, state);
@@ -80,7 +41,7 @@ function resolveFractionalSize(frValue: number, state: LayoutState): number {
   const containerSize = getElementSize(state.configuration.container, state);
   const availableSpace = containerSize - totalPxFromPanes - totalPxFromResizers;
 
-  return Math.max(0, (frValue / totalFr) * availableSpace);
+  return Math.max(0, (value / totalFr) * availableSpace);
 }
 
 function getElementSize(element: HTMLElement, state: LayoutState): number {

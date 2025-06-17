@@ -1,19 +1,19 @@
-import { FoldConfiguration, GridConfiguration, SizeDefinition } from "./public";
+import { GridConfiguration, TrackOptions } from "./public";
 
-export type FoldState = Required<FoldConfiguration> & {
+export type TrackState = Required<TrackOptions> & {
   collapsed: boolean;
-  size: SizeDefinition;
+  size: number;
 };
 
 export type SplitState = {
-  foldIndices: [number, number];
+  trackIndices: [number, number];
   resizerElement: HTMLElement;
 };
 
 export interface GridState {
   configuration: Required<GridConfiguration>;
   active: boolean;
-  folds: FoldState[];
+  tracks: TrackState[];
   splits: SplitState[];
 }
 export type StateUpdater = (state: GridState) => GridState;
